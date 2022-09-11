@@ -1,0 +1,25 @@
+#!/bin/bash
+yum install httpd -y
+systemctl start httpd.service
+systemctl enable httpd.service
+
+amazon-linux-extras install php7.4 -y
+systemctl enable  php-fpm.service
+
+
+
+wget https://wordpress.org/latest.tar.gz
+tar -xzvf latest.tar.gz
+mv wordpress/* /var/www/html/
+cd /var/www/html/
+cp -pvr wp-config-sample.php wp-config.php
+
+
+sed -i 's/database_name_here/${DATABASE_NAME}/g' wp-config.php
+sed -i 's/username_here/${DATABASE_USER}/g' wp-config.php
+sed -i 's/password_here/${DATABASE_PASSWORD}/g' wp-config.php
+sed -i 's/localhost/${DATABASE_HOST}/g' wp-config.php
+chown -R apache:apache /var/www/html/
+
+systemctl restart  php-fpm.service
+systemctl restart httpd.service
